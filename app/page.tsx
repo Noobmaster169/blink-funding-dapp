@@ -47,57 +47,50 @@ export default function Home() {
       }
     };
     fetchData();
-  }, []);
+  }, [wallet]);
   
-  const apicall = async () =>{
+  const apicall = async (href:any) =>{
     if(wallet){
-    //https://solana-action-mu.vercel.app/api/actions/donate?to=7J2qom6uYS1sExNZmxVyUbgjG7WQ4KuLe1T3NMDfHbfh&amount=10
-    fetch(`https://solana-action-mu.vercel.app/api/actions/donate?to=7J2qom6uYS1sExNZmxVyUbgjG7WQ4KuLe1T3NMDfHbfh&amount=10`, {
-      method: 'POST',
-      body: JSON.stringify({ account: wallet.publicKey.toString(), })
-    })
+      const provider = new anchor.AnchorProvider(connection, wallet, anchor.AnchorProvider.defaultOptions());
+      await fetch(href, {
+        method: 'POST',
+        body: JSON.stringify({ account: wallet.publicKey.toString(), })
+      })
       .then(response => {
-        console.log(response);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         return response.json();
       })
-      .then(data => console.log(data))
+      .then(data => {
+        console.log(data.message);
+        console.log("Tansaction is:", data.transaction);
+        
+        //transaction -> base-64 decode then deserialize
+        //feePayer not added
+        //recentBlockHash not added
+        //then sign the account
+        //provider.sendAndConfirm(data.transaction);
+      })
       .catch(error => console.error('Failed to post data:', error));
    }
   }
 
-  const initateTx = (href:any) =>{
-    console.log(href);
-  }
-
-  // const serialized = async() =>{
-  //   if(wallet){
-  //     const tx = await connection.getTransaction();
-  //     const coder = new BorshCoder(IDL);
-
-  //     const ix = coder.instruction.decode();
-  //     // const tx = await conn.getTransaction(sig);
-  //     // const coder = new BorshCoder(IDL);
-  //     // const ix = coder.instruction.decode(
-  //     //   tx.transaction.message.instructions[0].data,
-  //     //   'base58',
-  //     // );
-  //     // if(!ix) throw new Error("could not parse data");
-  //     // const accountMetas = tx.transaction.message.instructions[0].map(
-  //     //   (idx) => ({
-  //     //     pubkey: tx.transaction.message.accountKeys[idx],
-  //     //     isSigner: tx.transaction.message.isAccountSigner(idx),
-  //     //     isWritable: tx.transaction.message.isAccountWritable(idx),
-  //     //   }),
-  //     // );
-  //     // const formatted = coder.instruction.format(ix, accountMetas);
-  //     // console.log(ix, formatted);
-  //   }
-  // };
-  
-  
+  const initateTx = async (href:any) =>{
+    if(wallet){
+      try{
+        apicall(href);
+        const queryParams = href.split('?')[1];
+        const value = queryParams.split('=')[1]; 
+        const option = value[value.length - 1];
+        fund(parseInt(option));
+      }catch(e){
+        console.log(e);
+      }
+    }else{
+      alert("Wallet Not Connected");
+    }
+  }  
   
   const transfer = async() =>{
     if(wallet){
@@ -106,7 +99,6 @@ export default function Home() {
       const program =  new anchor.Program<any>(IDL, programId, provider);
       const [fundingPDA, _bump] = findProgramAddressSync([], programId);
       console.log("Funding Account is:", fundingPDA.toString());
-      
       const meta1 = {pubkey: wallet.publicKey, isWritable: true, isSigner: false}
       const meta2 = {pubkey: wallet.publicKey, isWritable: true, isSigner: false}
       const tx = await program.methods
@@ -117,15 +109,13 @@ export default function Home() {
         })
         .remainingAccounts([meta1, meta2]).rpc();
       console.log("Transaction:", tx)
-      console.log("PDA is:", fundingPDA.toString());
-      
       }catch(e){
         console.log(e)
       }
     }
   }
 
-  const fund = async() =>{
+  const fund = async(option:number = 0) =>{
     if(wallet){
       try{
       const provider = new anchor.AnchorProvider(connection, wallet, anchor.AnchorProvider.defaultOptions());
@@ -134,20 +124,17 @@ export default function Home() {
       console.log("Funding Account is:", fundingPDA.toString());
       
       const tx = await program.methods
-        .fund(new anchor.BN(0.01 * anchor.web3.LAMPORTS_PER_SOL), 0)
+        .fund(new anchor.BN(0.01 * anchor.web3.LAMPORTS_PER_SOL), option)
         .accounts({
           fundingAccount: fundingPDA,
           authority : wallet.publicKey
         }).rpc();
       console.log("Transaction:", tx)
-      console.log("PDA is:", fundingPDA.toString());
-      
       }catch(e){
         console.log(e)
       }
     }
   }
-
 
   const deposit = async() =>{
     if(wallet){
@@ -172,24 +159,17 @@ export default function Home() {
     }
   }
 
-  const execute = async () =>{
+  const initialize = async () =>{
     if(wallet){
       try{
-      console.log("IDL:", IDL);
-      console.log("Wallet Detected:", wallet.publicKey.toString());
-
       const provider = new anchor.AnchorProvider(connection, wallet, anchor.AnchorProvider.defaultOptions());
       const program =  new anchor.Program<any>(IDL, programId, provider);
 
       const [pda, _bump] = findProgramAddressSync([], programId);
       console.log("PDA is:", pda.toString());
-    
-      console.log("Program Created")
       const tx = await program.methods.initialize(wallet.publicKey, [wallet.publicKey, wallet.publicKey])
         .accounts({fundingAccount: pda, authority: wallet.publicKey}).rpc();
       console.log("Transaction:", tx)
-      console.log("PDA is:", pda.toString());
-      
       }catch(e){
         console.log(e)
       }
@@ -222,9 +202,6 @@ export default function Home() {
         <div className="boxContainer flex justify-between">
             {apiOptions}
         </div>
-      </div>
-      <div>  
-        <button onClick={fund}>Click To Call Function</button>
       </div>
     </main>
     </>
