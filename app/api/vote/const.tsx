@@ -14,7 +14,7 @@ export const DEFAULT_RPC = process.env.RPC_URL ?? clusterApiUrl("devnet");
 
 export const DEFAULT_TITLE = process.env.TITLE ?? "Quadratic Funding with BLINKS";
 
-export const DEFAULT_AVATAR = process.env.AVATAR ?? "https://github.com/Noobmaster169/solana-blink/blob/main/public/solana_devs.jpg?raw=true";
+export const DEFAULT_AVATAR = process.env.AVATAR ?? "https://github.com/Noobmaster169/blink-funding-dapp/blob/main/public/solana_devs.png?raw=true";
 
 export const DEFAULT_DESCRIPTION = process.env.DESCRIPTION ?? "This Funding Account is funded with donations to two different communities. Try this app to see how to participate in a Quadratic Funding using BLINKS";
 

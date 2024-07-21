@@ -27,12 +27,31 @@ export default function Home() {
   const [apiResponse, setApiResponse] = useState<any>({});
   const [apiOptions, setApiOptions] = useState<any>([]);
 
+  useEffect(() => {
+    //Get the Blinks Data From The API
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/vote');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setApiResponse(data);    
+        let apiOptions:any = []
+        data.links.actions.map((item:any, key:any)=>{
+          apiOptions.push(<div onClick={() =>{initateTx(item.href)}} className="boxButton" key={key}>{item.label}</div>);
+        });
+        setApiOptions(apiOptions);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+    fetchData();
+  }, []);
+  
   const apicall = async () =>{
     if(wallet){
     //https://solana-action-mu.vercel.app/api/actions/donate?to=7J2qom6uYS1sExNZmxVyUbgjG7WQ4KuLe1T3NMDfHbfh&amount=10
-    const to = 'your-program-id'; // Replace with your actual program ID
-    const option = 10; // Replace with your actual option value
-
     fetch(`https://solana-action-mu.vercel.app/api/actions/donate?to=7J2qom6uYS1sExNZmxVyUbgjG7WQ4KuLe1T3NMDfHbfh&amount=10`, {
       method: 'POST',
       body: JSON.stringify({ account: wallet.publicKey.toString(), })
@@ -48,78 +67,35 @@ export default function Home() {
       .catch(error => console.error('Failed to post data:', error));
    }
   }
-  
-  const localapi = async () =>{
-    if(wallet){
-      const response = await fetch(`api/vote?to=${programId.toString()}&option=0`, {
-        method: 'POST',
-        body: JSON.stringify({ account: wallet.publicKey.toString(), })
-      }).then(response => {
-        console.log(response);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => console.log(data))
-      .catch(error => console.error('Failed to post data:', error));
-    }
-  }
-  
-  //Get the Blinks API
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/vote');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setApiResponse(data);
-        console.log(data);
-
-        
-        let apiOptions:any = []
-        data.links.actions.map((item:any, key:any)=>{
-          apiOptions.push(<div onClick={() =>{initateTx(item.href)}} className="boxButton" key={key}>{item.label}</div>);
-        });
-        setApiOptions(apiOptions);
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const initateTx = (href:any) =>{
     console.log(href);
   }
 
-  const serialized = async() =>{
-    if(wallet){
-      const tx = await connection.getTransaction();
-      const coder = new BorshCoder(IDL);
+  // const serialized = async() =>{
+  //   if(wallet){
+  //     const tx = await connection.getTransaction();
+  //     const coder = new BorshCoder(IDL);
 
-      const ix = coder.instruction.decode();
-      // const tx = await conn.getTransaction(sig);
-      // const coder = new BorshCoder(IDL);
-      // const ix = coder.instruction.decode(
-      //   tx.transaction.message.instructions[0].data,
-      //   'base58',
-      // );
-      // if(!ix) throw new Error("could not parse data");
-      // const accountMetas = tx.transaction.message.instructions[0].map(
-      //   (idx) => ({
-      //     pubkey: tx.transaction.message.accountKeys[idx],
-      //     isSigner: tx.transaction.message.isAccountSigner(idx),
-      //     isWritable: tx.transaction.message.isAccountWritable(idx),
-      //   }),
-      // );
-      // const formatted = coder.instruction.format(ix, accountMetas);
-      // console.log(ix, formatted);
-    }
-  };
+  //     const ix = coder.instruction.decode();
+  //     // const tx = await conn.getTransaction(sig);
+  //     // const coder = new BorshCoder(IDL);
+  //     // const ix = coder.instruction.decode(
+  //     //   tx.transaction.message.instructions[0].data,
+  //     //   'base58',
+  //     // );
+  //     // if(!ix) throw new Error("could not parse data");
+  //     // const accountMetas = tx.transaction.message.instructions[0].map(
+  //     //   (idx) => ({
+  //     //     pubkey: tx.transaction.message.accountKeys[idx],
+  //     //     isSigner: tx.transaction.message.isAccountSigner(idx),
+  //     //     isWritable: tx.transaction.message.isAccountWritable(idx),
+  //     //   }),
+  //     // );
+  //     // const formatted = coder.instruction.format(ix, accountMetas);
+  //     // console.log(ix, formatted);
+  //   }
+  // };
   
   
   
@@ -248,7 +224,7 @@ export default function Home() {
         </div>
       </div>
       <div>  
-        <button onClick={localapi}>Click To Call Function</button>
+        <button onClick={fund}>Click To Call Function</button>
       </div>
     </main>
     </>

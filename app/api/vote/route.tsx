@@ -151,13 +151,13 @@ import {
     let programId: PublicKey = PROGRAM_ID;
     let option: number = 0;
   
-    try {
-      if (requestUrl.searchParams.get("to")) {
-        programId = new PublicKey(requestUrl.searchParams.get("to")!);
-      }
-    } catch (err) {
-      throw "Invalid input query parameter: to";
-    }
+    // try {
+    //   if (requestUrl.searchParams.get("to")) {
+    //     programId = new PublicKey(requestUrl.searchParams.get("to")!);
+    //   }
+    // } catch (err) {
+    //   throw "Invalid input query parameter: to";
+    // }
   
     try {
       if (requestUrl.searchParams.get("option")) {
