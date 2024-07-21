@@ -6,8 +6,8 @@ import AppWalletProvider from "../components/AppWalletProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Blink NFT DApp",
-  description: "DApp to mint Solana NFT and sell it using Solana Blinks",
+  title: "Blink DApp",
+  description: "DApp for Quadratic Funding using Solana Blinks",
 };
  
 export default function RootLayout({

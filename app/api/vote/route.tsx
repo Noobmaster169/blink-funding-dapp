@@ -21,6 +21,8 @@ import {
     DEFAULT_DESCRIPTION,
     PROGRAM_ID,
   } from "./const";
+  import * as anchor from '@project-serum/anchor';
+  import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey';
   
   export const GET = async (req: Request) => {
     try {
@@ -42,11 +44,11 @@ import {
         links: {
           actions: [
             {
-              label: `Send ${amount} SOL for First Option`, // button text
+              label: `1st Option: ${amount} SOL`, // button text
               href: `${baseHref}&option=0`,
             },
             {
-              label: `Send ${amount} SOL for Second Option`, // button text
+              label: `2nd Option: ${amount} SOL`, // button text
               href: `${baseHref}&option=1`,
             },
           ],
@@ -93,6 +95,7 @@ import {
   
       //How to create the Anchor Wallet instance???
       const connection = new Connection(DEFAULT_RPC);
+      const [fundingPDA, _bump] = findProgramAddressSync([], programId);
   
       // ensure the receiving account will be rent exempt
       const minimumBalance = await connection.getMinimumBalanceForRentExemption(
@@ -123,7 +126,8 @@ import {
       const payload: ActionPostResponse = await createPostResponse({
         fields: {
           transaction,
-          message: `Send ${amount} SOL to ${programId.toBase58()}`,
+          //message: `Send ${amount} SOL to ${programId.toBase58()}`,
+          message: `Send ${amount} SOL to ${fundingPDA.toString()}`,
         },
         // note: no additional signers are needed
         // signers: [],
@@ -160,9 +164,10 @@ import {
         option = parseInt(requestUrl.searchParams.get("option")!);
       }
   
-      if (option <= 0) throw "Invalid Option";
+      if (option < 0) throw "Invalid Option";
+      if (option > 1) throw "Invalid Option";
     } catch (err) {
-      throw "Invalid input query parameter: amount";
+      throw "Invalid input query parameter: option";
     }
   
     return {
