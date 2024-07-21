@@ -34,9 +34,9 @@ import {
       const payload: ActionGetResponse = {
         title: DEFAULT_TITLE,
         icon:
-          DEFAULT_AVATAR ?? new URL("/cute_pic.jpeg", requestUrl.origin).toString(),
+          DEFAULT_AVATAR ?? new URL("/solana_devs.jpg", requestUrl.origin).toString(),
         description: DEFAULT_DESCRIPTION,
-        label: "Transfer", // this value will be ignored since `links.actions` exists
+        label: "Quadratic Funding with BLINKS", // this value will be ignored since `links.actions` exists
         links: {
           actions: [
             {
@@ -53,10 +53,15 @@ import {
             },
             {
               label: "Send SOL", // button text
-              href: `${baseHref}&amount={amount}`, // this href will have a text input
+              href: `${baseHref}&amount={amount}&option={option}`, // this href will have a text input
               parameters: [
                 {
                   name: "amount", // parameter name in the `href` above
+                  label: "Enter the amount of SOL to send", // placeholder of the text input
+                  required: true,
+                },
+                {
+                  name: "option", // parameter name in the `href` above
                   label: "Enter the amount of SOL to send", // placeholder of the text input
                   required: true,
                 },
