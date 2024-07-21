@@ -45,6 +45,9 @@ import {
       }
   
       const transaction = new Transaction();
+
+
+      //transaction.add( await program.methods......transaction() );
   
       transaction.add(
         // note: createPostResponse 
