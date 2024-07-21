@@ -19,15 +19,17 @@ import {
     DEFAULT_TITLE,
     DEFAULT_AVATAR,
     DEFAULT_DESCRIPTION,
+    PROGRAM_ID,
   } from "./const";
   
   export const GET = async (req: Request) => {
     try {
       const requestUrl = new URL(req.url);
-      const { toPubkey, amount } = validatedQueryParams(requestUrl);
+      const { option, programId } = validatedQueryParams(requestUrl);
   
+      const amount = DEFAULT_SOL_AMOUNT;
       const baseHref = new URL(
-        `/api/actions/donate?to=${toPubkey.toBase58()}`,
+        `/api/vote?to=${programId.toBase58()}`,
         requestUrl.origin
       ).toString();
   
@@ -40,27 +42,12 @@ import {
         links: {
           actions: [
             {
-              label: `Send ${amount} SOL`, // button text
-              href: `${baseHref}&amount=${amount}`,
+              label: `Send ${amount} SOL for First Option`, // button text
+              href: `${baseHref}&option=0`,
             },
             {
-              label: `Send ${amount * 5} SOL`, // button text
-              href: `${baseHref}&amount=${amount * 5}`,
-            },
-            {
-              label: `Send ${amount * 10} SOL`, // button text
-              href: `${baseHref}&amount=${amount * 10}`,
-            },
-            {
-              label: "Send SOL", // button text
-              href: `${baseHref}&amount={amount}`, // this href will have a text input
-              parameters: [
-                {
-                  name: "amount", // parameter name in the `href` above
-                  label: "Enter the amount of SOL to send", // placeholder of the text input
-                  required: true,
-                },
-              ],
+              label: `Send ${amount} SOL for Second Option`, // button text
+              href: `${baseHref}&option=1`,
             },
           ],
         },
@@ -87,8 +74,10 @@ import {
   export const POST = async (req: Request) => {
     try {
       const requestUrl = new URL(req.url);
-      const { amount, toPubkey } = validatedQueryParams(requestUrl);
+      const { option, programId } = validatedQueryParams(requestUrl);
   
+      const empty = option;
+      const amount = DEFAULT_SOL_AMOUNT;
       const body: ActionPostRequest = await req.json();
   
       // validate the client provided input
@@ -102,6 +91,7 @@ import {
         });
       }
   
+      //How to create the Anchor Wallet instance???
       const connection = new Connection(DEFAULT_RPC);
   
       // ensure the receiving account will be rent exempt
@@ -109,7 +99,7 @@ import {
         0 // note: simple accounts that just store native SOL have `0` bytes of data
       );
       if (amount * LAMPORTS_PER_SOL < minimumBalance) {
-        throw `account may not be rent exempt: ${toPubkey.toBase58()}`;
+        throw `account may not be rent exempt: ${programId.toBase58()}`;
       }
   
       const transaction = new Transaction();
@@ -118,7 +108,7 @@ import {
       transaction.add(
         SystemProgram.transfer({
           fromPubkey: account,
-          toPubkey: toPubkey,
+          toPubkey: programId,
           lamports: amount * LAMPORTS_PER_SOL,
         })
       );
@@ -133,7 +123,7 @@ import {
       const payload: ActionPostResponse = await createPostResponse({
         fields: {
           transaction,
-          message: `Send ${amount} SOL to ${toPubkey.toBase58()}`,
+          message: `Send ${amount} SOL to ${programId.toBase58()}`,
         },
         // note: no additional signers are needed
         // signers: [],
@@ -154,29 +144,29 @@ import {
   };
   
   function validatedQueryParams(requestUrl: URL) {
-    let toPubkey: PublicKey = DEFAULT_SOL_ADDRESS;
-    let amount: number = DEFAULT_SOL_AMOUNT;
+    let programId: PublicKey = PROGRAM_ID;
+    let option: number = 0;
   
     try {
       if (requestUrl.searchParams.get("to")) {
-        toPubkey = new PublicKey(requestUrl.searchParams.get("to")!);
+        programId = new PublicKey(requestUrl.searchParams.get("to")!);
       }
     } catch (err) {
       throw "Invalid input query parameter: to";
     }
   
     try {
-      if (requestUrl.searchParams.get("amount")) {
-        amount = parseFloat(requestUrl.searchParams.get("amount")!);
+      if (requestUrl.searchParams.get("option")) {
+        option = parseInt(requestUrl.searchParams.get("option")!);
       }
   
-      if (amount <= 0) throw "amount is too small";
+      if (option <= 0) throw "Invalid Option";
     } catch (err) {
       throw "Invalid input query parameter: amount";
     }
   
     return {
-      amount,
-      toPubkey,
+      option,
+      programId,
     };
   }
