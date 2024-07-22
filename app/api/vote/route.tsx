@@ -93,10 +93,18 @@ import {
         });
       }
   
-      //How to create the Anchor Wallet instance???
+      //
+      const dummy = anchor.web3.Keypair.generate();
       const connection = new Connection(DEFAULT_RPC);
+      const program = new anchor.AnchorProvider(connection, dummy, anchor.AnchorProvider.defaultOptions());
       const [fundingPDA, _bump] = findProgramAddressSync([], programId);
-  
+
+      const anchorTransaction = new Transaction();
+      try{
+        anchorTransaction.add(program.methods.fund(amount * LAMPORTS_PER_SOL, option).accounts({fundingAccount: fundingPDA, authority: account}).transaction());
+      }catch(e){
+        console.log("Error:", e);
+      }
       // ensure the receiving account will be rent exempt
       const minimumBalance = await connection.getMinimumBalanceForRentExemption(
         0 // note: simple accounts that just store native SOL have `0` bytes of data

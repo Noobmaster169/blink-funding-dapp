@@ -63,9 +63,11 @@ export default function Home() {
         return response.json();
       })
       .then(data => {
+        console.log(data);
         console.log(data.message);
         console.log("Tansaction is:", data.transaction);
         
+        //Process only allowed on solana action side
         //transaction -> base-64 decode then deserialize
         //feePayer not added
         //recentBlockHash not added
@@ -122,7 +124,9 @@ export default function Home() {
       const program =  new anchor.Program<any>(IDL, programId, provider);
       const [fundingPDA, _bump] = findProgramAddressSync([], programId);
       console.log("Funding Account is:", fundingPDA.toString());
-      
+      console.log("Program:", program);
+      console.log(JSON.stringify(program));
+
       const tx = await program.methods
         .fund(new anchor.BN(0.01 * anchor.web3.LAMPORTS_PER_SOL), option)
         .accounts({

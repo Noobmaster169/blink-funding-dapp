@@ -1,36 +1,67 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Quadratic Funding with Solana & BLINKS
+
+I made a smart contract using anchor to implement a simple quadratic funding. Then I tried to make an API connection using Solana Blinks.
+
+## Smart Contract
+
+The project uses Anchor to build a simple Solana Smart contract with a similar to Quadratic Funding features.
+
+The owner of the Quadratic Funding will initialize the funding account and deposit the funding balance to the communities/funding parties. Then, users will participate in the funding by voting their chosen options.
+
+The fund will then be distributed to the receivers by considering the numbers of votes received during the funding processes.
+
+## About BLINKS
+
+[BLINKS](https://solana.com/docs/advanced/actions) is a new technology within Solana that allows transactions to be passed through API features, allowing a seamless experience for users while making a transaction.
+
+This technology makes transactions on Solana sharable through a simple link that could be integrated on QR codes, button + widgets, or websites accross the internet.
+
+BLINKS allows developers to integrate Solana ecosystem to many different environments, allowing users to perform blockchain transactions without having to navigate to different app / webpages.
+
+## Usability
+
+The smart contract allow users to initiate a quadratic funding session to distribute a certain ammount of balance to several receivers. The contract can then be used to start a funding activity.
+
+The introduction of **BLINKS** in this applications take the proces one step further, allowing users to easily interact with the smart contract, ensuring that the funding activity could be easily shared & reached out to more participants & bigger communities.
+
+BLINKS application might need additional technology integrations & improvements before successfully opening a new path for further innovations with DApps & Smart Contracts. However, it is undoubted that the technology has the capability to further improve interaction with blockchain applications and make the activity seamless.
+
 ## Getting Started
 
-First, run the development server:
+First, clone the repo:
+
+```bash
+git clone https://github.com/Noobmaster169/blink-funding-dapp
+cd blink-funding-dapp
+```
+
+Then, install the packages:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+Finally, run the development server:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployed dApp
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Check out this dApp to explore how to try the quadratic funding. Please note that this application is deployed on Devnet, not mainnet.
 
-## Learn More
+[https://funding-with-blink.vercel.app/](https://funding-with-blink.vercel.app/)
 
-To learn more about Next.js, take a look at the following resources:
+## API Call To Vote in the funding
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+[https://funding-with-blink.vercel.app/api/vote/](https://funding-with-blink.vercel.app/api/vote/)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
